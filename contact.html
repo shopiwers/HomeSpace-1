@@ -49,11 +49,11 @@
 
         <nav id="navmenu" class="navmenu">
           <ul>
-            <li><a href="index.html" class="active">Inicio</a></li>
+            <li><a href="index.html">Inicio</a></li>
             <li><a href="about.html">Acerca de</a></li>
             <li><a href="services.html">Servicios</a></li>
             
-            <li><a href="contact.html">Contact</a></li>
+               <li><a href="contact.html">Mapa de inmuebles</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
@@ -80,7 +80,65 @@
 
       <!-- Map Section -->
       <div class="map-container mb-5">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <!-- Reemplaza la sección del mapa por este bloque interactivo -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+<div id="map-cucuta" style="width: 100%; height: 500px; border-radius: 12px; overflow: hidden;"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<script>
+  // Coordenadas aproximadas del centro de Cúcuta
+  const cucutaCenter = [7.8939, -72.5078];
+
+  // Genera 100 ubicaciones aleatorias en Cúcuta
+  function randomLocations(center, count, radiusKm) {
+    const locations = [];
+    for (let i = 0; i < count; i++) {
+      // Genera un punto aleatorio dentro de un círculo de radio radiusKm
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * radiusKm;
+      // 1 grado latitud ~ 111km, longitud depende de latitud
+      const dx = distance * Math.cos(angle) / 111;
+      const dy = distance * Math.sin(angle) / (111 * Math.cos(center[0] * Math.PI / 180));
+      const lat = center[0] + dx;
+      const lng = center[1] + dy;
+      // Valor aleatorio entre $180.000.000 y $800.000.000
+      const value = Math.floor(Math.random() * (800000000 - 180000000 + 1)) + 180000000;
+      locations.push({ lat, lng, value, id: i + 1 });
+    }
+    return locations;
+  }
+
+  const locations = randomLocations(cucutaCenter, 100, 8); // 8km de radio
+
+  // Inicializa el mapa
+  const map = L.map('map-cucuta').setView(cucutaCenter, 12);
+
+  // Capa base de OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Agrupador de marcadores
+  const markers = L.markerClusterGroup();
+
+  // Crea los marcadores
+  locations.forEach(loc => {
+    const marker = L.marker([loc.lat, loc.lng]);
+    marker.bindPopup(
+      `<strong>Propiedad #${loc.id}</strong><br>
+      Valor: $${loc.value.toLocaleString('es-CO')}
+      `
+    );
+    marker.bindTooltip(`$${loc.value.toLocaleString('es-CO')}`, {permanent: false});
+    markers.addLayer(marker);
+  });
+
+  map.addLayer(markers);
+</script>
       </div>
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -93,8 +151,8 @@
                 <i class="bi bi-geo-alt"></i>
               </div>
               <div class="info-content">
-                <h4>Location</h4>
-                <p>482 Pine Street, Seattle, Washington 98101</p>
+                <h4>Localización</h4>
+                <p>Prados Norte</p>
               </div>
             </div>
           </div>
@@ -166,69 +224,80 @@
 
   </main>
 
-  <footer id="footer" class="footer accent-background">
+   <footer id="footer" class="footer accent-background">
+      <div class="container footer-top">
+        <div class="row gy-4">
+          <div class="col-lg-7 col-md-12 footer-about">
+            <a href="index.html" class="logo d-flex align-items-center">
+              <span class="sitename">Inmobiliaria</span>
+            </a>
+            <p>
+              Te ayudamos a hacer realidad el proyecto de vida que siempre imaginaste. 
+              Desde la compra de tu primer terreno hasta la construcción de tu hogar ideal, 
+              contamos con la experiencia y aliados que necesitas para comenzar.
 
-    <div class="container footer-top">
-      <div class="row gy-4">
-        <div class="col-lg-5 col-md-12 footer-about">
-          <a href="index.html" class="logo d-flex align-items-center">
-            <span class="sitename">HomeSpace</span>
-          </a>
-          <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
-          <div class="social-links d-flex mt-4">
-            <a href=""><i class="bi bi-twitter-x"></i></a>
-            <a href=""><i class="bi bi-facebook"></i></a>
-            <a href=""><i class="bi bi-instagram"></i></a>
-            <a href=""><i class="bi bi-linkedin"></i></a>
+
+            </p>
+            <div class="social-links d-flex mt-4">
+              <a href=""><i class="bi bi-twitter-x"></i></a>
+              <a href=""><i class="bi bi-facebook"></i></a>
+              <a href=""><i class="bi bi-instagram"></i></a>
+              <a href=""><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-2 col-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">About us</a></li>
+              <li><a href="#">Services</a></li>
+              <li><a href="#">Terms of service</a></li>
+              <li><a href="#">Privacy policy</a></li>
+            </ul>
+          </div> -->
+
+          <div class="col-lg-2 col-6 footer-links">
+            <h4>Nuestros Servicios</h4>
+            <ul>
+              <li><a>Asesoría Inmobiliaria</a></li>
+              <li><a>Compra y Venta de Propiedades</a></li>
+              <li><a>Créditos</a></li>
+              <li><a>Acompañamiento legal</a></li>
+              
+            </ul>
+          </div>
+
+          <div
+            class="col-lg-3 col-md-12 footer-contact text-center text-md-start"
+          >
+            <h4>Contactanos</h4>
+            <p>Norte de Santander</p>
+            <p>Cúcuta</p>
+            <p>Prados Norte</p>
+            <p class="mt-4">
+              <strong>Telefono:</strong> <span>+57 3194416135</span>
+            </p>
+            <p><strong>Email:</strong> <span>info@example.com</span></p>
           </div>
         </div>
-
-        <div class="col-lg-2 col-6 footer-links">
-          <h4>Useful Links</h4>
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About us</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Terms of service</a></li>
-            <li><a href="#">Privacy policy</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-6 footer-links">
-          <h4>Our Services</h4>
-          <ul>
-            <li><a href="#">Web Design</a></li>
-            <li><a href="#">Web Development</a></li>
-            <li><a href="#">Product Management</a></li>
-            <li><a href="#">Marketing</a></li>
-            <li><a href="#">Graphic Design</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-          <h4>Contact Us</h4>
-          <p>A108 Adam Street</p>
-          <p>New York, NY 535022</p>
-          <p>United States</p>
-          <p class="mt-4"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
-          <p><strong>Email:</strong> <span>info@example.com</span></p>
-        </div>
-
       </div>
-    </div>
 
-    <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">HomeSpace</strong> <span>All Rights Reserved</span></p>
-      <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you've purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span>
+          <strong class="px-1 sitename">Inmobiliaria</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+        <div class="credits">
+          <!-- All the links in the footer should remain intact. -->
+          <!-- You can delete the links only if you've purchased the pro version. -->
+          <!-- Licensing information: https://bootstrapmade.com/license/ -->
+          <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+          Designed by <a href="https://bootstrapmade.com/">apps</a>
+        </div>
       </div>
-    </div>
-
-  </footer>
+    </footer>
 
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
